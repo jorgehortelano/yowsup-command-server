@@ -218,8 +218,8 @@ class DemosArgParser(YowArgParser):
         echoOpts = self.add_argument_group("Echo client demo")
         echoOpts.add_argument('-e', '--echo', action = "store_true", help = "Start the Yowsup Echo client")
 
-	commandOpts = self.add_argument_group("Command Server demo")
-	commandOpts.add_argument('-x', '--commandserver', action = "store_true", help = "Start the Yowsup Command Server")
+        commandOpts = self.add_argument_group("Command Server demo")
+        commandOpts.add_argument('-x', '--commandserver', action = "store_true", help = "Start the Yowsup Command Server")
 
         sendOpts = self.add_argument_group("Send client demo")
         sendOpts.add_argument('-s', '--send', action="store", help = "Send a message to specified phone number, "

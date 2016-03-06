@@ -5,6 +5,10 @@ from yowsup.layers.interface                           import YowInterfaceLayer,
 
 class CommandServerLayer(YowInterfaceLayer):
     __allowed_users = []
+    
+    def __init__(self, allowed_users):
+        super(CommandServerLayer, self).__init__()
+        self.__allowed_users = allowed_users
 
     #Executes a command if the user is in the allowed_user list. 
     def executeCommand(self, messageProtocolEntity, command):	

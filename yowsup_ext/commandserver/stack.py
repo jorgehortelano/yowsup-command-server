@@ -20,7 +20,7 @@ class YowsupCommandServerStack(object):
         if encryptionEnabled:
             from yowsup.layers.axolotl                     import YowAxolotlLayer
             layers = (
-                CommandServerLayer,
+                CommandServerLayer(allowed_users),
                 YowParallelLayer([YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer, YowMediaProtocolLayer, YowIqProtocolLayer, YowCallsProtocolLayer]),
                 YowAxolotlLayer,
                 YowLoggerLayer,

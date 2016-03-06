@@ -9,11 +9,16 @@ After installing yowsup. Install this extension running:
 ```
 python setup.py install
 ```
-Modify the file layer.py inside commandserver folder to add an allowed client. Modify the line:
 
-	allowed_users = ['34666888999@s.whatsapp.net']
-	
-And add your user id. If you have no idea of wich user you have, execute the demo application and check the error message at the console when you send a whatsapp to the server.
+## Config
+Create a configuration file where the whatsapp credentials are, as in other examples of yowsup. Something like:
+
+	cc=39
+	phone=39111111111
+	password=c5NWTzOrsgCRQr77Yhwafdj+Tgg=
+	allowed_users = ['39111222333@s.whatsapp.net']
+
+Note: the new line allowed_users. This arrays define which phone numbers can send commands to the server. 
 
 ## Execution
 
@@ -21,12 +26,7 @@ To launch yowsup as a command server, from the folder where the file "yowsup-cli
 
 	python yowsup-cli demos --config <file.config> --commandserver
 	
-where "file.config" is a file where the whatsapp credentials are, as in other examples of yowsup. Something like:
-
-	cc=39
-	phone=39XXXXXXXX
-	password=c5NWTzOrsgCRQr77Yhwafdj+Tgg=
-
+Where the file.config is the previous defined configuration file.
 
 ## Allowing new commands
 

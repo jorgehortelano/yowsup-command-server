@@ -2,7 +2,7 @@
 from __future__ import print_function
 from setuptools import setup, find_packages
 
-deps = ['yowsup2==2.4.48', 'yowlayer-store==0.1', 'commandserver']
+deps = ['yowsup2==2.4.48', 'yowsup-commandserver']
 
 setup(
     name='yowsup-commandserver',
@@ -11,7 +11,6 @@ setup(
     install_requires = deps,
     dependency_links = [
         'https://github.com/tgalal/yowsup/archive/develop.zip#egg=yowsup2-2.4.48',
-        'https://github.com/tgalal/yowlayer-store/archive/master.zip#egg=yowlayer-store-0.1'
     ],
     packages= find_packages(),
     include_package_data=True,

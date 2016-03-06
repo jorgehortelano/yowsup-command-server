@@ -9,7 +9,7 @@ After installing yowsup. Install this extension running:
 ```
 python setup.py install
 ```
-Modify the file layer.py to add an allowed client. Modify the line:
+Modify the file layer.py inside commandserver folder to add an allowed client. Modify the line:
 
 	allowed_users = ['34666888999@s.whatsapp.net']
 	

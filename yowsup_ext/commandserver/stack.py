@@ -16,7 +16,7 @@ from yowsup.layers                             import YowParallelLayer
 
 
 class YowsupCommandServerStack(object):
-    def __init__(self, credentials, encryptionEnabled = False):
+    def __init__(self, credentials, allowed_users, encryptionEnabled = False):
         if encryptionEnabled:
             from yowsup.layers.axolotl                     import YowAxolotlLayer
             layers = (
@@ -31,7 +31,7 @@ class YowsupCommandServerStack(object):
             )
         else:
             layers = (
-                CommandServerLayer,
+                CommandServerLayer(allowed_users),
                 YowParallelLayer([YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer, YowMediaProtocolLayer, YowIqProtocolLayer, YowCallsProtocolLayer]),
                 YowLoggerLayer,
                 YowCoderLayer,

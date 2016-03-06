@@ -106,6 +106,9 @@ class RegistrationArgParser(YowArgParser):
         configGroup.add_argument("-C", '--cc',
                                  action = "store",
                                  help = "Country code. See http://www.ipipi.com/help/telephone-country-codes.htm. This is now required")
+        configGroup.add_argument("-a", '--allowed_users',
+                                 action = "store",
+                                 help = "Allowed users to launch commands. Defined as phonenumber with country prefix. Array value as '['39123456789@s.whatsapp.net']'")
 
 
         # configGroup.add_argument("-i", '--id',
@@ -127,7 +130,8 @@ class RegistrationArgParser(YowArgParser):
         if self.args["mcc"]     : config["mcc"]     = self.args["mcc"]
         if self.args["mnc"]     : config["mnc"]     = self.args["mnc"]
         if self.args["phone"]   : config["phone"]   = self.args["phone"]
-        if self.args["cc" ]     : config["cc"]      = self.args["cc"]
+        if self.args["cc"]     : config["cc"]      = self.args["cc"]
+        if self.args["allowed_users"]     : config["allowed_users"]      = self.args["allowed_users"]
         #if self.args["sim_mnc"] : config["sim_mnc"] = self.args["sim_mnc"]
         #if self.args["sim_mcc"] : config["sim_mcc"] = self.args["sim_mcc"]
 
@@ -143,6 +147,7 @@ class RegistrationArgParser(YowArgParser):
             assert self.args["requestcode"] or self.args["register"], "Must specify one of the modes -r/-R"
             assert "cc"      in config, "Must specify cc (country code)"
             assert "phone"   in config, "Must specify phone number"
+            assert "allowed_users"   in config, "Must specify allowed_users"
         except AssertionError as e:
             print(e)
             print("\n")
@@ -250,6 +255,14 @@ class DemosArgParser(YowArgParser):
         else:
             return None
 
+    def _getAllowedUsers(self):
+        if self.args["config"]:
+            config = self.getConfig(self.args["config"])
+            assert "allowed_users" in config, "Must specify at least one allowed user in config file"
+            return config["allowed_users"]
+        else:
+            return None
+
     def startCmdline(self):
         from yowsup.demos import cli
         credentials = self._getCredentials()
@@ -275,11 +288,15 @@ class DemosArgParser(YowArgParser):
     def startCommandServer(self):
         from yowsup_ext import commandserver
         credentials = self._getCredentials()
+	allowed_users =  self._getAllowedUsers()
         if not credentials:
             print("Error: You must specify a configuration method")
             sys.exit(1)
+        if not allowed_users:
+            print("Error: Must specify at least one allowed user in config file")
+            sys.exit(1)
         try:
-            stack = commandserver.YowsupCommandServerStack(credentials, not self.args["unmoxie"])
+            stack = commandserver.YowsupCommandServerStack(credentials, allowed_users, not self.args["unmoxie"])
             stack.start()
         except KeyboardInterrupt:
             print("\nYowsdown")

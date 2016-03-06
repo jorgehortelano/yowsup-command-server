@@ -1,1 +1,7 @@
 yowsup.config
+*.pyc
+.project
+*~
+/build
+/dist
+/yowsup_commandserver.egg-info

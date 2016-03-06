@@ -3,14 +3,12 @@ import string
 import subprocess
 from yowsup.layers.interface                           import YowInterfaceLayer, ProtocolEntityCallback
 
-#Users that can execute commands. The complete user name is printed in console when not allowed. Copy to this array, 
-allowed_users = ['34666888999@s.whatsapp.net']
-
 class CommandServerLayer(YowInterfaceLayer):
+    __allowed_users = []
 
     #Executes a command if the user is in the allowed_user list. 
     def executeCommand(self, messageProtocolEntity, command):	
-        if messageProtocolEntity.getFrom() in allowed_users:	    
+        if messageProtocolEntity.getFrom() in self.__allowed_users:	    
             status = subprocess.check_output(command)
             print("Status: "+status)
             messageProtocolEntity.setBody(status)

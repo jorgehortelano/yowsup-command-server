@@ -273,7 +273,7 @@ class DemosArgParser(YowArgParser):
             sys.exit(0)
 
     def startCommandServer(self):
-        from yowsup.demos import commandserver
+        from yowsup_ext import commandserver
         credentials = self._getCredentials()
         if not credentials:
             print("Error: You must specify a configuration method")

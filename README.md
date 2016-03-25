@@ -24,7 +24,7 @@ Note: the new line allowed_users. This arrays define which phone numbers can sen
 
 To launch yowsup as a command server, from the folder where the file "yowsup-cli" exists, execute: 
 
-	python yowsup-cli demos --config <file.config> --commandserver
+	yowsup-commandserver run -c <file.config>
 	
 Where the file.config is the previous defined configuration file.
 

@@ -1,0 +1,181 @@
+#!/usr/bin/env python
+__version__ = "0.1"
+__author__ = "Jorge Hortelano"
+
+import sys, argparse, yowsup, logging
+
+logger = logging.getLogger("yowsup-cli")
+
+class YowArgParser(argparse.ArgumentParser):
+    def __init__(self, *args, **kwargs):
+        super(YowArgParser, self).__init__(*args, **kwargs)
+        self.add_argument("-v", "--version",
+            action = "store_true",
+            help = "Print version info and exit"
+        )
+
+        self.add_argument("-d", "--debug",
+            action = "store_true",
+            help = "Show debug messages"
+        )
+
+        self.args = {}
+    def getArgs(self):
+        return self.parse_args()
+
+    def getConfig(self, config):
+        try:
+            f = open(config)
+            out = {}
+            for l in f:
+                line = l.strip()
+                if len(line) and line[0] not in ('#',';'):
+                    prep = line.split('#', 1)[0].split(';', 1)[0].split('=', 1)
+                    varname = prep[0].strip()
+                    val = prep[1].strip()
+                    out[varname.replace('-', '_')] = val
+            return out
+        except IOError:
+            print("Invalid config path: %s" % config)
+            sys.exit(1)
+
+    def process(self):
+        self.args = vars(self.parse_args())
+        if self.args["version"]:
+            print("yowsup-commandserver v%s\nUsing yowsup v%s" % (__version__, yowsup.__version__))
+            sys.exit(0)
+
+        if self.args["debug"]:
+            logging.basicConfig(level = logging.DEBUG)
+        else:
+            logging.basicConfig(level = logging.INFO)
+
+class CommandServerArgParser(YowArgParser):
+    def __init__(self, *args, **kwargs):
+        super(CommandServerArgParser, self).__init__(*args, **kwargs)
+        self.description = "Run a yowsup-commandserver"
+
+        configGroup = self.add_argument_group("Configuration options for demos")
+        credentialsOpts = configGroup.add_mutually_exclusive_group()
+        credentialsOpts.add_argument("-l", "--login", action="store", metavar="phone:b64password",
+                                     help = "WhatsApp login credentials, in the format phonenumber:password, where password is base64 encoded.")
+        credentialsOpts.add_argument("-c", "--config", action="store",
+                                     help = "Path to config file containing authentication info. For more info about config format use --help-config")
+
+        configGroup.add_argument("-M", "--unmoxie", action="store_true", help="Disable E2E Encryption")
+
+    def process(self):
+        super(CommandServerArgParser, self).process()
+        self.startCommandServer()
+
+    def _getCredentials(self):
+        if self.args["login"]:
+            return tuple(self.args["login"].split(":"))
+        elif self.args["config"]:
+            config = self.getConfig(self.args["config"])
+            assert "password" in config and "phone" in config, "Must specify at least phone number and password in config file"
+            return config["phone"], config["password"]
+        else:
+            return None
+
+    def _getAllowedUsers(self):
+        if self.args["config"]:
+            config = self.getConfig(self.args["config"])
+            assert "allowed_users" in config, "Must specify at least one allowed user in config file"
+            return config["allowed_users"]
+        else:
+            return None
+
+    def startCmdline(self):
+        from yowsup.demos import cli
+        credentials = self._getCredentials()
+        if not credentials:
+            print("Error: You must specify a configuration method")
+            sys.exit(1)
+        stack = cli.YowsupCliStack(credentials, not self.args["unmoxie"])
+        stack.start()
+
+    def startEcho(self):
+        from yowsup.demos import echoclient
+        credentials = self._getCredentials()
+        if not credentials:
+            print("Error: You must specify a configuration method")
+            sys.exit(1)
+        try:
+            stack = echoclient.YowsupEchoStack(credentials, not self.args["unmoxie"])
+            stack.start()
+        except KeyboardInterrupt:
+            print("\nYowsdown")
+            sys.exit(0)
+
+    def startCommandServer(self):
+        from yowsup_ext import commandserver
+        credentials = self._getCredentials()
+        allowed_users =  self._getAllowedUsers()
+        if not credentials:
+            print("Error: You must specify a configuration method")
+            sys.exit(1)
+        if not allowed_users:
+            print("Error: Must specify at least one allowed user in config file")
+            sys.exit(1)
+        try:
+            stack = commandserver.YowsupCommandServerStack(credentials, allowed_users, not self.args["unmoxie"])
+            stack.start()
+        except KeyboardInterrupt:
+            print("\nYowsdown")
+            sys.exit(0)
+
+    def startSendClient(self):
+        from yowsup.demos import sendclient
+        credentials = self._getCredentials()
+        if not credentials:
+            print("Error: You must specify a configuration method")
+            sys.exit(1)
+
+        try:
+            stack = sendclient.YowsupSendStack(credentials, [([self.args["send"][0], self.args["send"][1]])],
+                                               not self.args["unmoxie"])
+            stack.start()
+        except KeyboardInterrupt:
+            print("\nYowsdown")
+            sys.exit(0)
+
+    def startSyncContacts(self):
+        from yowsup.demos import contacts
+        credentials = self._getCredentials()
+        if not credentials:
+            print("Error: You must specify a configuration method")
+            sys.exit(1)
+        try:
+            stack = contacts.YowsupSyncStack(credentials,self.args["sync"].split(','), not self.args["unmoxie"])
+            stack.start()
+        except KeyboardInterrupt:
+            print("\nYowsdown")
+            sys.exit(0)
+
+
+if __name__ == "__main__":
+    args = sys.argv
+    if(len(args) > 1):
+        del args[0]
+
+
+    modeDict = {
+        "run":        CommandServerArgParser,
+        "version":      None
+    }
+
+    if(len(args) == 0 or args[0] not in modeDict):
+        print("Available commands:\n===================")
+        print(", ".join(modeDict.keys()))
+
+        sys.exit(1)
+
+    mode = args[0]
+    if mode == "version":
+        print("yowsup-commandserver v%s\nUsing yowsup v%s" % (__version__, yowsup.__version__))
+        sys.exit(0)
+    else:
+        parser = modeDict[mode]()
+        if not parser.process():
+            parser.print_help()

@@ -4,8 +4,8 @@
 # 
 # chkconfig: 345 80 10
 # description: Yowsup whatsapp command server
-# processname: yowsup
-# pidfile: /var/run/yowsup/yowsup.pid
+# processname: yowsup-commandserver
+# pidfile: /var/run/yowsup/yowsup-commandserver.pid
 # source function library
 
 ######################################
@@ -14,7 +14,7 @@
 
 EXEC=/usr/local/bin/yowsup-commandserver
 CONFIG_FILE=/etc/yowsup.config
-PID_FILE=/var/run/yowsup/yowsup.pid
+PID_FILE=/var/run/yowsup/yowsup-commandserver.pid
 WAIT_BEFORE_KILL=30
 
 ######################################

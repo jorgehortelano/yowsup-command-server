@@ -12,8 +12,8 @@
 # CONFIGURATION
 ######################################
 
-FOLDER=/usr/share/yowsup-commandserver
-CONFIG_FILE=yowsup.config
+EXEC=/usr/local/bin/yowsup-commandserver
+CONFIG_FILE=/etc/yowsup.config
 PID_FILE=/var/run/yowsup/yowsup.pid
 WAIT_BEFORE_KILL=30
 
@@ -23,15 +23,15 @@ WAIT_BEFORE_KILL=30
 
 start()
 {
-	echo "Starting yowsup..."
+	echo "Starting yowsup command server..."
 	echo "------------------------------"
-	/usr/bin/python ${FOLDER}/yowsup-cli demos --config ${FOLDER}/${CONFIG_FILE} --commandserver 
+	/usr/bin/python ${EXEC} run -c ${CONFIG_FILE}
 	echo ""
 }
 
 stop()
 {
-	echo "Stopping yowsup..."
+	echo "Stopping yowsup command server..."
 	echo "------------------------------"
 	forceStop;
 	echo ""

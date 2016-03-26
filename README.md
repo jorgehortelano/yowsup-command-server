@@ -22,7 +22,7 @@ Note: the new line allowed_users. This arrays define which phone numbers can sen
 
 ## Execution
 
-To launch yowsup as a command server, from the folder where the file "yowsup-cli" exists, execute: 
+To launch this command server extension, execute:
 
 	yowsup-commandserver run -c <file.config>
 	
